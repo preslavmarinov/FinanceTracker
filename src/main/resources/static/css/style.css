@@ -272,6 +272,300 @@ input, select, textarea, button {
 }
 
 /* ============================================================
+   Stats Grid (Dashboard)
+   ============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+}
+
+.stat-card.stat-income  { border-left-color: #48BB78; }
+.stat-card.stat-expense { border-left-color: var(--color-expense); }
+.stat-card.stat-positive { border-left-color: #4299E1; }
+.stat-card.stat-negative { border-left-color: var(--color-expense); }
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -.5px;
+}
+
+/* ============================================================
+   Section Cards
+   ============================================================ */
+.section-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.link-muted {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   Data Table
+   ============================================================ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead tr {
+  background: var(--color-bg);
+}
+
+.data-table th {
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--color-text-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.data-table tbody tr:hover { background: #F7FAFC; }
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+.amount-income { color: var(--color-income); font-weight: 600; }
+.amount-expense { color: var(--color-expense); font-weight: 600; }
+
+/* ============================================================
+   Badges
+   ============================================================ */
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.badge-income  { background: var(--color-income-bg);  color: var(--color-income);  }
+.badge-expense { background: var(--color-expense-bg); color: var(--color-expense); }
+.badge-neutral { background: #EDF2F7; color: var(--color-text-muted); }
+
+/* ============================================================
+   Filter Panel
+   ============================================================ */
+.filter-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.results-meta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   Forms
+   ============================================================ */
+.form-card {
+  padding: 28px 32px;
+}
+
+.form-card-sm { max-width: 480px; }
+
+.main-form { display: flex; flex-direction: column; gap: 20px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.form-group-lg { grid-column: 1 / -1; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+  width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(45,106,79,.12);
+}
+
+.form-group textarea { resize: vertical; }
+
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23718096' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.input-prefix {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.input-prefix:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(45,106,79,.12);
+}
+
+.prefix-symbol {
+  padding: 9px 10px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  border-right: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.input-prefix input {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  flex: 1;
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--color-expense);
+  font-weight: 500;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.required { color: var(--color-expense); }
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+/* ============================================================
+   Action buttons (table inline)
+   ============================================================ */
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.note-indicator {
+  font-size: 7px;
+  color: var(--color-primary);
+  vertical-align: super;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Empty state
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+/* ============================================================
    Auth Pages
    ============================================================ */
 .auth-page {

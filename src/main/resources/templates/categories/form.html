@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${category.id == null ? 'New Category' : 'Edit Category'})}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title"
+                th:text="${category.id == null ? 'New Category' : 'Edit Category'}">Category</h1>
+            <a th:href="@{/categories}" class="btn btn-ghost">&larr; Back</a>
+        </header>
+        <main class="content">
+            <section class="section-card form-card form-card-sm">
+
+                <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+                <form th:action="${category.id == null ? '/categories/new' : '/categories/' + category.id + '/edit'}"
+                      th:object="${category}"
+                      method="post" class="main-form">
+
+                    <div class="form-group">
+                        <label for="name">Category Name <span class="required">*</span></label>
+                        <input type="text" id="name" th:field="*{name}"
+                               placeholder="e.g. Food & Dining" required autofocus/>
+                        <span class="field-error" th:if="${#fields.hasErrors('name')}"
+                              th:errors="*{name}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Applies to</label>
+                        <select id="type" th:field="*{type}">
+                            <option value="">Both (Income &amp; Expense)</option>
+                            <option th:each="t : ${types}"
+                                    th:value="${t.name()}"
+                                    th:text="${t.name()}"></option>
+                        </select>
+                        <small class="field-hint">Leave as "Both" if the category works for either type.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"
+                                th:text="${category.id == null ? 'Create Category' : 'Save Changes'}">
+                            Save
+                        </button>
+                        <a th:href="@{/categories}" class="btn btn-ghost">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

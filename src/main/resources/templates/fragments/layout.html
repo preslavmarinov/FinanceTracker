@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} + ' — Finance Tracker'">Finance Tracker</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+
+<body>
+
+<!-- Sidebar fragment -->
+<aside th:fragment="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+        <span class="brand-icon">&#9670;</span>
+        <span class="brand-name">FinTrack</span>
+    </div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/dashboard}"
+           th:classappend="${#httpServletRequest.requestURI == '/dashboard'} ? 'active' : ''"
+           class="nav-link">
+            <span class="nav-icon">&#9632;</span> Dashboard
+        </a>
+        <a th:href="@{/transactions}"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/transactions')} ? 'active' : ''"
+           class="nav-link">
+            <span class="nav-icon">&#8644;</span> Transactions
+        </a>
+        <a th:href="@{/categories}"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/categories')} ? 'active' : ''"
+           class="nav-link">
+            <span class="nav-icon">&#9670;</span> Categories
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <span class="sidebar-user" sec:authentication="name">User</span>
+        <form th:action="@{/auth/logout}" method="post" style="display:inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+</aside>
+
+<!-- Main layout wrapper fragment -->
+<div th:fragment="page(title, content)" class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title" th:text="${title}">Page</h1>
+        </header>
+        <main class="content" th:insert="${content}"></main>
+    </div>
+</div>
+
+</body>
+</html>
