@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:fragment="head(title)">
+<head th:fragment="head(title, extraCss)">
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title th:text="${title} + ' — Finance Tracker'">Finance Tracker</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link th:if="${extraCss != null and !#strings.isEmpty(extraCss)}"
+          rel="stylesheet" th:href="@{'/css/' + ${extraCss}}"/>
 </head>
 
 <body>

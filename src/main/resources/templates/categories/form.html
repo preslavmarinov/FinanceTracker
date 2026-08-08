@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head(${category.id == null ? 'New Category' : 'Edit Category'})}"></head>
+<head th:replace="~{fragments/layout :: head(${category.id == null ? 'New Category' : 'Edit Category'}, '')}"></head>
 <body>
 <div class="app-wrapper">
     <aside th:replace="~{fragments/layout :: sidebar}"></aside>
