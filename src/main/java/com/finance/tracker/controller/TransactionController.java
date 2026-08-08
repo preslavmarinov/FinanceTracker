@@ -9,6 +9,7 @@ import com.finance.tracker.service.CategoryService;
 import com.finance.tracker.service.TransactionService;
 import com.finance.tracker.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -38,12 +39,22 @@ public class TransactionController {
     @GetMapping
     public String list(@AuthenticationPrincipal UserDetails userDetails,
                        @ModelAttribute TransactionFilterDto filter,
+                       @RequestParam(defaultValue = "1") int page,
+                       @RequestParam(defaultValue = "10") int pageSize,
                        Model model) {
         User user = userService.findByUsername(userDetails.getUsername());
-        List<Transaction> transactions = transactionService.findAll(user, filter);
+
+        if (pageSize != 5 && pageSize != 10 && pageSize != 25 && pageSize != 50) pageSize = 10;
+        if (page < 1) page = 1;
+
+        Page<Transaction> transactionPage = transactionService.findAll(user, filter, page - 1, pageSize);
         List<Category> categories = categoryService.findAll(user);
 
-        model.addAttribute("transactions", transactions);
+        model.addAttribute("transactions", transactionPage.getContent());
+        model.addAttribute("totalElements", transactionPage.getTotalElements());
+        model.addAttribute("totalPages", transactionPage.getTotalPages());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", pageSize);
         model.addAttribute("categories", categories);
         model.addAttribute("filter", filter);
         model.addAttribute("types", TransactionType.values());

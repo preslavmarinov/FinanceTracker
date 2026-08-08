@@ -64,9 +64,19 @@
                 </form>
             </section>
 
-            <!-- Results count -->
-            <div class="results-meta">
-                <span th:text="${#lists.size(transactions)} + ' transaction(s) found'">0 transactions found</span>
+            <!-- Results meta + page size -->
+            <div class="pagination-meta">
+                <span th:text="${totalElements} + ' transaction(s) found'">0 found</span>
+                <div class="page-size-picker">
+                    <label>Show</label>
+                    <select id="pageSizeSelect" onchange="changePageSize(this.value)">
+                        <option th:each="s : ${#arrays.toArray({5, 10, 25, 50})}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == pageSize}"></option>
+                    </select>
+                    <label>per page</label>
+                </div>
             </div>
 
             <!-- Transactions table -->
@@ -120,8 +130,65 @@
                 </table>
             </section>
 
+            <!-- Paginator -->
+            <div th:if="${totalPages > 1}" class="paginator">
+                <button class="page-btn" onclick="goToPage(1)"
+                        th:disabled="${currentPage == 1}">&laquo;</button>
+                <button class="page-btn" th:onclick="'goToPage(' + ${currentPage - 1} + ')'"
+                        th:disabled="${currentPage == 1}">&lsaquo;</button>
+
+                <th:block th:each="p : ${#numbers.sequence(1, totalPages)}">
+                    <button th:if="${p == 1 or p == totalPages or (p >= currentPage - 2 and p <= currentPage + 2)}"
+                            class="page-btn"
+                            th:classappend="${p == currentPage} ? ' page-btn-active' : ''"
+                            th:onclick="'goToPage(' + ${p} + ')'"
+                            th:text="${p}">1</button>
+                    <span th:if="${(p == 2 and currentPage > 4) or (p == totalPages - 1 and currentPage < totalPages - 3)}"
+                          class="page-ellipsis">…</span>
+                </th:block>
+
+                <button class="page-btn" th:onclick="'goToPage(' + ${currentPage + 1} + ')'"
+                        th:disabled="${currentPage == totalPages}">&rsaquo;</button>
+                <button class="page-btn" th:onclick="'goToPage(' + ${totalPages} + ')'"
+                        th:disabled="${currentPage == totalPages}">&raquo;</button>
+
+                <div class="page-jump">
+                    <span>Go to</span>
+                    <input type="number" id="pageJumpInput" min="1" th:max="${totalPages}"
+                           th:value="${currentPage}"
+                           onkeydown="if(event.key==='Enter') jumpToPage()"/>
+                </div>
+
+                <span class="page-info"
+                      th:text="'Page ' + ${currentPage} + ' of ' + ${totalPages}">Page 1 of 1</span>
+            </div>
         </main>
     </div>
 </div>
+
+<script>
+    function goToPage(page) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    function changePageSize(size) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('pageSize', size);
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    function jumpToPage() {
+        const input = document.getElementById('pageJumpInput');
+        const page = parseInt(input.value);
+        const totalPages = parseInt(input.max);
+        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+            goToPage(page);
+        }
+    }
+</script>
+
 </body>
 </html>

@@ -32,16 +32,13 @@ public class DashboardController {
         User user = userService.findByUsername(userDetails.getUsername());
         TransactionService.DashboardStats stats = transactionService.getDashboardStats(user);
 
-        var recentTransactions = transactionService.findAll(user, new TransactionFilterDto());
+        var recentTransactions = transactionService.findAll(user, new TransactionFilterDto(), 0, 5).getContent();
         if (recentTransactions == null) {
             recentTransactions = Collections.emptyList();
         }
 
-        int previewCount = Math.min(recentTransactions.size(), 5);
-        var previewList = recentTransactions.subList(0, previewCount);
-
         model.addAttribute("stats", stats);
-        model.addAttribute("recentTransactions", previewList);
+        model.addAttribute("recentTransactions", recentTransactions);
         model.addAttribute("pieChartData", transactionService.getMonthlyExpensesByCategory(user));
         model.addAttribute("currentUser", user);
 

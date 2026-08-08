@@ -5,6 +5,8 @@ import com.finance.tracker.model.Transaction;
 import com.finance.tracker.model.User;
 import com.finance.tracker.repository.TransactionRepository;
 import com.finance.tracker.spec.TransactionSpec;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<Transaction> findAll(User user, TransactionFilterDto filter) {
+    public Page<Transaction> findAll(User user, TransactionFilterDto filter, int page, int pageSize) {
         Specification<Transaction> spec = Specification.where(TransactionSpec.ofUser(user))
                 .and(TransactionSpec.ofType(filter.getType()))
                 .and(TransactionSpec.ofCategory(filter.getCategoryId()))
@@ -34,7 +36,8 @@ public class TransactionService {
                 .and(TransactionSpec.amountMax(filter.getAmountMax()))
                 .and(TransactionSpec.titleContains(filter.getKeyword()));
 
-        return transactionRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "date", "id"));
+        PageRequest pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "date", "id"));
+        return transactionRepository.findAll(spec, pageable);
     }
 
     public Transaction findById(Long id, User user) {
