@@ -18,17 +18,17 @@
     </div>
     <nav class="sidebar-nav">
         <a th:href="@{/dashboard}"
-           th:classappend="${#httpServletRequest.requestURI == '/dashboard'} ? 'active' : ''"
+           th:classappend="${currentUri == '/dashboard'} ? 'active' : ''"
            class="nav-link">
             <span class="nav-icon">&#9632;</span> Dashboard
         </a>
         <a th:href="@{/transactions}"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/transactions')} ? 'active' : ''"
+           th:classappend="${currentUri.startsWith('/transactions')} ? 'active' : ''"
            class="nav-link">
             <span class="nav-icon">&#8644;</span> Transactions
         </a>
         <a th:href="@{/categories}"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/categories')} ? 'active' : ''"
+           th:classappend="${currentUri.startsWith('/categories')} ? 'active' : ''"
            class="nav-link">
             <span class="nav-icon">&#9670;</span> Categories
         </a>

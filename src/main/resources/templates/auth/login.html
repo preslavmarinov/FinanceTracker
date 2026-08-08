@@ -23,7 +23,7 @@
         </div>
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-        <form th:action="@{/auth/login}" method="post" class="auth-form">
+        <form th:action="@{/auth/login}" method="post" class="auth-form" autocomplete="off">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username"

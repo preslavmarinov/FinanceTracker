@@ -18,7 +18,7 @@
         <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
         <div th:if="${passwordMismatch}" class="alert alert-error">Passwords do not match.</div>
 
-        <form th:action="@{/auth/signup}" th:object="${signupDto}" method="post" class="auth-form">
+        <form th:action="@{/auth/signup}" th:object="${signupDto}" method="post" class="auth-form" autocomplete="off">
              <div class="auth-name-row">
                 <div class="form-group">
                     <label for="firstName">First Name</label>
