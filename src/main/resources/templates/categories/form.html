@@ -33,7 +33,7 @@
                             <option value="">Both (Income &amp; Expense)</option>
                             <option th:each="t : ${types}"
                                     th:value="${t.name()}"
-                                    th:text="${t.name()}"></option>
+                                    th:text="${t.getLabel()}"></option>
                         </select>
                         <small class="field-hint">Leave as "Both" if the category works for either type.</small>
                     </div>

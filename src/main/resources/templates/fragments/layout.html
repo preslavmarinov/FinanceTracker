@@ -18,7 +18,7 @@
     </div>
     <nav class="sidebar-nav">
         <a th:href="@{/dashboard}"
-           th:classappend="${currentUri == '/dashboard'} ? 'active' : ''"
+           th:classappend="${currentUri == '/dashboard' || currentUri == '/'} ? 'active' : ''"
            class="nav-link">
             <span class="nav-icon">&#9632;</span> Dashboard
         </a>
@@ -32,6 +32,11 @@
            class="nav-link">
             <span class="nav-icon">&#9670;</span> Categories
         </a>
+        <a th:href="@{/budgets}"
+           th:classappend="${currentUri.startsWith('/budgets')} ? 'active' : ''"
+           class="nav-link">
+            <span class="nav-icon">&#9775;</span> Budgets
+        </a>
     </nav>
     <div class="sidebar-footer">
         <span class="sidebar-user" sec:authentication="name">User</span>
@@ -42,7 +47,7 @@
     </div>
 </aside>
 
-<!-- Main layout wrapper fragment -->
+<!-- Main layout header wrapper fragment -->
 <div th:fragment="page(title, content)" class="app-wrapper">
     <aside th:replace="~{fragments/layout :: sidebar}"></aside>
     <div class="main-area">

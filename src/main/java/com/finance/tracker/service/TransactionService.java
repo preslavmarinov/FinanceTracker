@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -65,6 +66,21 @@ public class TransactionService {
 
         return new DashboardStats(monthIncome, monthExpense, totalIncome, totalExpense);
     }
+
+    public List<PieSlice> getMonthlyExpensesByCategory(User user) {
+        LocalDate now = LocalDate.now();
+        LocalDate monthStart = now.withDayOfMonth(1);
+        LocalDate monthEnd = now.withDayOfMonth(now.lengthOfMonth());
+
+        List<Object[]> rows = transactionRepository.findExpensesByCategoryForPeriod(user, monthStart, monthEnd);
+        List<PieSlice> slices = new ArrayList<>();
+        for (Object[] row : rows) {
+            slices.add(new PieSlice((String) row[0], ((BigDecimal) row[1]).doubleValue()));
+        }
+        return slices;
+    }
+
+    public record PieSlice(String label, double value) {}
 
     public record DashboardStats(
             BigDecimal monthIncome,

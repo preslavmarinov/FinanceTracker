@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Budgets')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title">Budgets</h1>
+            <a th:href="@{/budgets/new}" class="btn btn-primary">+ New Budget</a>
+        </header>
+        <main class="content">
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div th:if="${#lists.isEmpty(budgetStatuses)}" class="empty-state">
+                <p>No budgets set. <a th:href="@{/budgets/new}">Create your first one.</a></p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(budgetStatuses)}" class="budget-grid">
+                <div th:each="bs : ${budgetStatuses}" class="budget-card"
+                     th:classappend="${bs.overBudget} ? 'budget-over' : (${bs.warning} ? 'budget-warning' : '')">
+
+                    <div class="budget-card-header">
+                        <div>
+                            <div class="budget-category" th:text="${bs.budget.category.name}">Category</div>
+                            <div class="budget-meta">
+                                Monthly limit:
+                                <strong th:text="'$' + ${#numbers.formatDecimal(bs.budget.monthlyLimit, 1, 2)}">$0.00</strong>
+                            </div>
+                        </div>
+                        <div class="action-btns">
+                            <a th:href="@{/budgets/{id}/edit(id=${bs.budget.id})}"
+                               class="btn btn-sm btn-ghost">Edit</a>
+                            <form th:action="@{/budgets/{id}/delete(id=${bs.budget.id})}"
+                                  method="post" style="display:inline"
+                                  onsubmit="return confirm('Delete this budget?')">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="budget-amounts">
+                        <span class="budget-spent"
+                              th:classappend="${bs.overBudget} ? 'text-over' : ''"
+                              th:text="'$' + ${#numbers.formatDecimal(bs.spent, 1, 2)} + ' spent'">$0.00 spent</span>
+                        <span class="budget-remaining"
+                              th:text="${bs.overBudget} ?
+                                '$' + ${#numbers.formatDecimal(bs.spent - bs.budget.monthlyLimit, 1, 2)} + ' over' :
+                                '$' + ${#numbers.formatDecimal(bs.budget.monthlyLimit - bs.spent, 1, 2)} + ' left'">
+                        </span>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-bar"
+                             th:classappend="${bs.overBudget} ? 'progress-over' : (${bs.warning} ? 'progress-warning' : 'progress-ok')"
+                             th:style="'width: ' + ${bs.progressBarWidth()} + '%'"></div>
+                    </div>
+
+                    <div class="budget-pct"
+                         th:text="${bs.percentage} + '% used this month'">0% used</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

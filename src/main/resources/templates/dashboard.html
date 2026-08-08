@@ -11,8 +11,6 @@
             <a th:href="@{/transactions/new}" class="btn btn-primary">+ New Transaction</a>
         </header>
         <main class="content">
-
-            <!-- Flash messages -->
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
             <!-- Stats cards -->
@@ -41,47 +39,112 @@
                 </div>
             </section>
 
-            <!-- Recent Transactions -->
-            <section class="section-card">
-                <div class="section-header">
-                    <h2>Recent Transactions</h2>
-                    <a th:href="@{/transactions}" class="link-muted">View all &rarr;</a>
-                </div>
+            <div class="dashboard-bottom">
+                <!-- Pie chart -->
+                <section class="section-card chart-card">
+                    <div class="section-header">
+                        <h2>Expenses by Category</h2>
+                        <span class="link-muted" th:text="${#temporals.format(#temporals.createNow(), 'MMMM yyyy')}"></span>
+                    </div>
+                    <div th:if="${#lists.isEmpty(pieChartData)}" class="empty-state">
+                        <p>No categorised expenses this month.</p>
+                    </div>
+                    <div th:if="${!#lists.isEmpty(pieChartData)}" class="pie-wrapper">
+                        <canvas id="pieChart" width="200" height="200"></canvas>
+                        <div class="pie-legend" id="pieLegend"></div>
+                    </div>
+                </section>
 
-                <div th:if="${#lists.isEmpty(recentTransactions)}" class="empty-state">
-                    <p>No transactions yet. <a th:href="@{/transactions/new}">Add your first one.</a></p>
-                </div>
+                <!-- Recent Transactions -->
+                <section class="section-card recent-card">
+                    <div class="section-header">
+                        <h2>Recent Transactions</h2>
+                        <a th:href="@{/transactions}" class="link-muted">View all &rarr;</a>
+                    </div>
 
-                <table th:if="${!#lists.isEmpty(recentTransactions)}" class="data-table">
-                    <thead>
+                    <div th:if="${#lists.isEmpty(recentTransactions)}" class="empty-state">
+                        <p>No transactions yet. <a th:href="@{/transactions/new}">Add your first one.</a></p>
+                    </div>
+
+                    <table th:if="${!#lists.isEmpty(recentTransactions)}" class="data-table">
+                        <thead>
                         <tr>
                             <th>Date</th>
                             <th>Title</th>
-                            <th>Category</th>
                             <th>Type</th>
                             <th class="text-right">Amount</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr th:each="tx : ${recentTransactions}">
-                            <td th:text="${#temporals.format(tx.date, 'MMM d, yyyy')}">Date</td>
+                            <td th:text="${#temporals.format(tx.date, 'MMM d')}">Date</td>
                             <td th:text="${tx.title}">Title</td>
-                            <td th:text="${tx.category != null ? tx.category.name : '—'}">—</td>
                             <td>
-                                <span th:text="${tx.type}"
-                                      th:classappend="${tx.type.name() == 'INCOME'} ? 'badge badge-income' : 'badge badge-expense'">
-                                </span>
+                                    <span th:text="${tx.type}"
+                                          th:classappend="${tx.type.name() == 'INCOME'} ? 'badge badge-income' : 'badge badge-expense'">
+                                    </span>
                             </td>
                             <td class="text-right"
                                 th:classappend="${tx.type.name() == 'INCOME'} ? 'amount-income' : 'amount-expense'"
                                 th:text="'$' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">$0.00</td>
                         </tr>
-                    </tbody>
-                </table>
-            </section>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
 
         </main>
     </div>
 </div>
+
+<script th:inline="javascript">
+    const pieData = /*[[${pieChartData}]]*/ [];
+
+    const COLORS = [
+        '#2D6A4F','#E76F51','#4A90D9','#9B59B6',
+        '#F4A261','#1ABC9C','#E74C3C','#3498DB',
+        '#F39C12','#8E44AD'
+    ];
+
+    function renderPie(data) {
+        const canvas = document.getElementById('pieChart');
+        if (!canvas || !data.length) return;
+        const ctx = canvas.getContext('2d');
+        const total = data.reduce((s, d) => s + d.value, 0);
+        const cx = 100, cy = 100, r = 90;
+        let start = -Math.PI / 2;
+
+        data.forEach((slice, i) => {
+            const angle = (slice.value / total) * 2 * Math.PI;
+            const end = start + angle;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, start, end);
+            ctx.closePath();
+            ctx.fillStyle = COLORS[i % COLORS.length];
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            start = end;
+        });
+
+        const legend = document.getElementById('pieLegend');
+        if (!legend) return;
+        data.forEach((slice, i) => {
+            const pct = ((slice.value / total) * 100).toFixed(1);
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML =
+                `<span class="legend-dot" style="background:${COLORS[i % COLORS.length]}"></span>` +
+                `<span class="legend-label">${slice.label}</span>` +
+                `<span class="legend-pct">${pct}%</span>`;
+            legend.appendChild(item);
+        });
+    }
+
+    renderPie(pieData);
+</script>
+
 </body>
 </html>

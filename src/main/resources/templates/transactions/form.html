@@ -44,7 +44,7 @@
                                 <option value="">Select type</option>
                                 <option th:each="t : ${types}"
                                         th:value="${t.name()}"
-                                        th:text="${t.name()}"></option>
+                                        th:text="${t.getLabel()}"></option>
                             </select>
                             <span class="field-error" th:if="${#fields.hasErrors('type')}"
                                   th:errors="*{type}"></span>

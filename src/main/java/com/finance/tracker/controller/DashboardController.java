@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Collections;
 
 @Controller
-@RequestMapping("/dashboard")
+@RequestMapping({"/dashboard", "/"})
 public class DashboardController {
     private final TransactionService transactionService;
     private final UserService userService;
@@ -42,6 +42,7 @@ public class DashboardController {
 
         model.addAttribute("stats", stats);
         model.addAttribute("recentTransactions", previewList);
+        model.addAttribute("pieChartData", transactionService.getMonthlyExpensesByCategory(user));
         model.addAttribute("currentUser", user);
 
         return "dashboard";

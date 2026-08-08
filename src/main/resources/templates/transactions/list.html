@@ -28,7 +28,7 @@
                                 <option value="">All types</option>
                                 <option th:each="t : ${types}"
                                         th:value="${t.name()}"
-                                        th:text="${t.name()}"></option>
+                                        th:text="${t.getLabel()}"></option>
                             </select>
                         </div>
                         <div class="form-group">
