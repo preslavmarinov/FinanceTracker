@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title">Dashboard</h1>
+            <a th:href="@{/transactions/new}" class="btn btn-primary">+ New Transaction</a>
+        </header>
+        <main class="content">
+
+            <!-- Flash messages -->
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <!-- Stats cards -->
+            <section class="stats-grid">
+                <div class="stat-card stat-income">
+                    <div class="stat-label">This Month Income</div>
+                    <div class="stat-value"
+                         th:text="'$' + ${#numbers.formatDecimal(stats.monthIncome, 1, 2)}">$0.00</div>
+                </div>
+                <div class="stat-card stat-expense">
+                    <div class="stat-label">This Month Expenses</div>
+                    <div class="stat-value"
+                         th:text="'$' + ${#numbers.formatDecimal(stats.monthExpense, 1, 2)}">$0.00</div>
+                </div>
+                <div class="stat-card"
+                     th:classappend="${stats.monthBalance().compareTo(T(java.math.BigDecimal).ZERO) >= 0} ? 'stat-positive' : 'stat-negative'">
+                    <div class="stat-label">This Month Balance</div>
+                    <div class="stat-value"
+                         th:text="'$' + ${#numbers.formatDecimal(stats.monthBalance(), 1, 2)}">$0.00</div>
+                </div>
+                <div class="stat-card"
+                     th:classappend="${stats.netBalance().compareTo(T(java.math.BigDecimal).ZERO) >= 0} ? 'stat-positive' : 'stat-negative'">
+                    <div class="stat-label">Net Balance (All Time)</div>
+                    <div class="stat-value"
+                         th:text="'$' + ${#numbers.formatDecimal(stats.netBalance(), 1, 2)}">$0.00</div>
+                </div>
+            </section>
+
+            <!-- Recent Transactions -->
+            <section class="section-card">
+                <div class="section-header">
+                    <h2>Recent Transactions</h2>
+                    <a th:href="@{/transactions}" class="link-muted">View all &rarr;</a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(recentTransactions)}" class="empty-state">
+                    <p>No transactions yet. <a th:href="@{/transactions/new}">Add your first one.</a></p>
+                </div>
+
+                <table th:if="${!#lists.isEmpty(recentTransactions)}" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tx : ${recentTransactions}">
+                            <td th:text="${#temporals.format(tx.date, 'MMM d, yyyy')}">Date</td>
+                            <td th:text="${tx.title}">Title</td>
+                            <td th:text="${tx.category != null ? tx.category.name : '—'}">—</td>
+                            <td>
+                                <span th:text="${tx.type}"
+                                      th:classappend="${tx.type.name() == 'INCOME'} ? 'badge badge-income' : 'badge badge-expense'">
+                                </span>
+                            </td>
+                            <td class="text-right"
+                                th:classappend="${tx.type.name() == 'INCOME'} ? 'amount-income' : 'amount-expense'"
+                                th:text="'$' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

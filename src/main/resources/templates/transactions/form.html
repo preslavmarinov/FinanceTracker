@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${transaction.id == null ? 'New Transaction' : 'Edit Transaction'})}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title"
+                th:text="${transaction.id == null ? 'New Transaction' : 'Edit Transaction'}">Transaction</h1>
+            <a th:href="@{/transactions}" class="btn btn-ghost">&larr; Back</a>
+        </header>
+        <main class="content">
+            <section class="section-card form-card">
+                <form th:action="${transaction.id == null ? '/transactions/new' : '/transactions/' + transaction.id + '/edit'}"
+                      th:object="${transaction}"
+                      method="post" class="main-form">
+
+                    <div class="form-row">
+                        <div class="form-group form-group-lg">
+                            <label for="title">Title <span class="required">*</span></label>
+                            <input type="text" id="title" th:field="*{title}"
+                                   placeholder="e.g. Grocery shopping" required/>
+                            <span class="field-error" th:if="${#fields.hasErrors('title')}"
+                                  th:errors="*{title}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount">Amount <span class="required">*</span></label>
+                            <div class="input-prefix">
+                                <span class="prefix-symbol">$</span>
+                                <input type="number" id="amount" th:field="*{amount}"
+                                       step="0.01" min="0.01" placeholder="0.00" required/>
+                            </div>
+                            <span class="field-error" th:if="${#fields.hasErrors('amount')}"
+                                  th:errors="*{amount}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="type">Type <span class="required">*</span></label>
+                            <select id="type" th:field="*{type}" required>
+                                <option value="">Select type</option>
+                                <option th:each="t : ${types}"
+                                        th:value="${t.name()}"
+                                        th:text="${t.name()}"></option>
+                            </select>
+                            <span class="field-error" th:if="${#fields.hasErrors('type')}"
+                                  th:errors="*{type}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" th:field="*{category.id}">
+                                <option value="">No category</option>
+                                <option th:each="cat : ${categories}"
+                                        th:value="${cat.id}"
+                                        th:text="${cat.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date">Date <span class="required">*</span></label>
+                            <input type="date" id="date" th:field="*{date}" required/>
+                            <span class="field-error" th:if="${#fields.hasErrors('date')}"
+                                  th:errors="*{date}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" th:field="*{notes}"
+                                  rows="3" placeholder="Optional notes..."></textarea>
+                        <span class="field-error" th:if="${#fields.hasErrors('notes')}"
+                              th:errors="*{notes}"></span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"
+                                th:text="${transaction.id == null ? 'Add Transaction' : 'Save Changes'}">
+                            Save
+                        </button>
+                        <a th:href="@{/transactions}" class="btn btn-ghost">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

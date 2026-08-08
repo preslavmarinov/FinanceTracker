@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Transactions')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="main-area">
+        <header class="top-bar">
+            <h1 class="page-title">Transactions</h1>
+            <a th:href="@{/transactions/new}" class="btn btn-primary">+ New Transaction</a>
+        </header>
+        <main class="content">
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <!-- Filter panel -->
+            <section class="filter-panel">
+                <form th:action="@{/transactions}" method="get" th:object="${filter}" class="filter-form">
+                    <div class="filter-row">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input type="text" th:field="*{keyword}" placeholder="Title keyword..."/>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select th:field="*{type}">
+                                <option value="">All types</option>
+                                <option th:each="t : ${types}"
+                                        th:value="${t.name()}"
+                                        th:text="${t.name()}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select th:field="*{categoryId}">
+                                <option value="">All categories</option>
+                                <option th:each="cat : ${categories}"
+                                        th:value="${cat.id}"
+                                        th:text="${cat.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>From</label>
+                            <input type="date" th:field="*{dateFrom}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>To</label>
+                            <input type="date" th:field="*{dateTo}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Min amount</label>
+                            <input type="number" th:field="*{amountMin}" step="0.01" min="0" placeholder="0.00"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Max amount</label>
+                            <input type="number" th:field="*{amountMax}" step="0.01" min="0" placeholder="0.00"/>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-secondary">Apply Filters</button>
+                        <a th:href="@{/transactions}" class="btn btn-ghost">Clear</a>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Results count -->
+            <div class="results-meta">
+                <span th:text="${#lists.size(transactions)} + ' transaction(s) found'">0 transactions found</span>
+            </div>
+
+            <!-- Transactions table -->
+            <div th:if="${#lists.isEmpty(transactions)}" class="empty-state">
+                <p>No transactions match your filters.</p>
+            </div>
+
+            <section th:if="${!#lists.isEmpty(transactions)}" class="section-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th class="text-right">Amount</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tx : ${transactions}">
+                            <td th:text="${#temporals.format(tx.date, 'MMM d, yyyy')}">Date</td>
+                            <td>
+                                <span th:text="${tx.title}">Title</span>
+                                <span th:if="${tx.notes != null and !tx.notes.isBlank()}"
+                                      class="note-indicator" title="Has notes">&#9679;</span>
+                            </td>
+                            <td th:text="${tx.category != null ? tx.category.name : '—'}">—</td>
+                            <td>
+                                <span th:text="${tx.type}"
+                                      th:classappend="${tx.type.name() == 'INCOME'} ? 'badge badge-income' : 'badge badge-expense'">
+                                </span>
+                            </td>
+                            <td class="text-right"
+                                th:classappend="${tx.type.name() == 'INCOME'} ? 'amount-income' : 'amount-expense'"
+                                th:text="'$' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">$0.00</td>
+                            <td class="text-center">
+                                <div class="action-btns">
+                                    <a th:href="@{/transactions/{id}/edit(id=${tx.id})}"
+                                       class="btn btn-sm btn-ghost">Edit</a>
+                                    <form th:action="@{/transactions/{id}/delete(id=${tx.id})}"
+                                          method="post" style="display:inline"
+                                          onsubmit="return confirm('Delete this transaction?')">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>
