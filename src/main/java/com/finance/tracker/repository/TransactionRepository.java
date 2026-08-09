@@ -20,6 +20,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     Optional<Transaction> findByIdAndUser(Long id, User user);
 
+    List<Transaction> findByUserAndDateBetweenOrderByDateAsc(User user, LocalDate from, LocalDate to);
+
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user = :user AND t.type = 'INCOME' AND t.date BETWEEN :from AND :to")
     BigDecimal sumIncomeForPeriod(@Param("user") User user, @Param("from") LocalDate from, @Param("to") LocalDate to);
 

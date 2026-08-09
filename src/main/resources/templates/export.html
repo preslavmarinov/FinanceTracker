@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Export Report', 'export.css')}"></head>
+<body>
+<div class="app-wrapper">
+  <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+  <div class="main-area">
+    <header class="top-bar">
+      <h1 class="page-title">Export Report</h1>
+    </header>
+    <main class="content">
+      <section class="section-card export-card">
+        <p class="export-description">
+          Generate a detailed CSV report you can open in Excel or Google Sheets.
+          Includes transactions, category breakdowns, and budget utilization.
+        </p>
+
+        <form id="exportForm" class="main-form">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <div class="form-group">
+            <label>Report Type</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="reportType" value="monthly"
+                       id="typeMonthly" checked onchange="togglePeriod()"/>
+                <span>Monthly</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reportType" value="yearly"
+                       id="typeYearly" onchange="togglePeriod()"/>
+                <span>Yearly</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="monthlyPicker" class="period-row">
+            <div class="form-group">
+              <label for="monthSelect">Month</label>
+              <select id="monthSelect" name="month">
+                <option th:each="entry : ${monthNames}"
+                        th:value="${entry.key}"
+                        th:text="${entry.value}"
+                        th:selected="${entry.key == currentMonth}"></option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="monthYearSelect">Year</label>
+              <select id="monthYearSelect" name="year">
+                <option th:each="y : ${years}"
+                        th:value="${y}"
+                        th:text="${y}"
+                        th:selected="${y == currentYear}"></option>
+              </select>
+            </div>
+          </div>
+
+          <div id="yearlyPicker" class="period-row" style="display:none">
+            <div class="form-group">
+              <label for="yearOnlySelect">Year</label>
+              <select id="yearOnlySelect">
+                <option th:each="y : ${years}"
+                        th:value="${y}"
+                        th:text="${y}"
+                        th:selected="${y == currentYear}"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="export-actions">
+            <button type="submit" id="generateBtn" class="btn btn-primary btn-export">
+              <span id="btnText">Generate &amp; Download</span>
+              <span id="btnLoader" class="btn-loader"></span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section-card export-info">
+        <h2 class="card-section-title">What's included</h2>
+        <ul class="export-info-list">
+          <li><strong>Summary</strong> — Total income, expense, and net balance for the period</li>
+          <li><strong>Budget Overview</strong> — Monthly limits vs actual spend per category</li>
+          <li><strong>Income by Category</strong> — All income sources broken down by category</li>
+          <li><strong>Expense by Category</strong> — All expenses broken down by category</li>
+          <li><strong>Transactions</strong> — Every transaction with date, title, category, type, amount, and notes</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+    function togglePeriod() {
+        const isYearly = document.getElementById('typeYearly').checked;
+        document.getElementById('monthlyPicker').style.display = isYearly ? 'none' : 'flex';
+        document.getElementById('yearlyPicker').style.display = isYearly ? 'flex' : 'none';
+    }
+
+    document.getElementById('exportForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const btn     = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const loader  = document.getElementById('btnLoader');
+
+        btn.disabled = true;
+        btnText.textContent = 'Generating...';
+        loader.style.display = 'inline-block';
+
+        try {
+            const formData = new FormData(this);
+
+            if (document.getElementById('typeYearly').checked) {
+                formData.set('year', document.getElementById('yearOnlySelect').value);
+            }
+
+            const response = await fetch('/export/download', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams(formData)
+            });
+
+            if (!response.ok) throw new Error('Server error');
+
+            const blob        = await response.blob();
+            const disposition = response.headers.get('Content-Disposition') || '';
+            const match       = disposition.match(/filename="?([^";\r\n]+)"?/);
+            const filename    = match ? match[1] : 'finance-report.csv';
+
+            const url = URL.createObjectURL(blob);
+            const a   = document.createElement('a');
+            a.href     = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            btnText.textContent = 'Download Again';
+        } catch (err) {
+            btnText.textContent = 'Error — Try Again';
+        } finally {
+            btn.disabled = false;
+            loader.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
