@@ -57,6 +57,7 @@
                             <input type="number" th:field="*{amountMax}" step="0.01" min="0" placeholder="0.00"/>
                         </div>
                     </div>
+                    <input type="hidden" name="pageSize" th:value="${pageSize}"/>
                     <div class="filter-actions">
                         <button type="submit" class="btn btn-secondary">Apply Filters</button>
                         <a th:href="@{/transactions}" class="btn btn-ghost">Clear</a>

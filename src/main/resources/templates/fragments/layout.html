@@ -39,9 +39,14 @@
            class="nav-link">
             <span class="nav-icon">&#9775;</span> Budgets
         </a>
+        <a th:href="@{/profile}"
+           th:classappend="${currentUri.startsWith('/profile')} ? 'active' : ''"
+           class="nav-link">
+            <span class="nav-icon">&#9998;</span> Profile
+        </a>
     </nav>
     <div class="sidebar-footer">
-        <span class="sidebar-user" sec:authentication="name">User</span>
+        <span class="sidebar-user" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName : ''}">User</span>
         <form th:action="@{/auth/logout}" method="post" style="display:inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <button type="submit" class="logout-btn">Logout</button>

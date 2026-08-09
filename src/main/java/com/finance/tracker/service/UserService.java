@@ -1,6 +1,8 @@
 package com.finance.tracker.service;
 
+import com.finance.tracker.dto.ChangePasswordDto;
 import com.finance.tracker.dto.SignupDto;
+import com.finance.tracker.dto.UpdateProfileDto;
 import com.finance.tracker.model.User;
 import com.finance.tracker.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -52,5 +54,30 @@ public class UserService implements UserDetailsService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
+    @Transactional
+    public User updateProfile(User user, UpdateProfileDto dto) {
+        if (!user.getUsername().equals(dto.getUsername())
+                && userRepository.existsByUsernameAndIdNot(dto.getUsername(), user.getId())) {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setUsername(dto.getUsername());
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(User user, ChangePasswordDto dto) {
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("New passwords do not match");
+        }
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 }
